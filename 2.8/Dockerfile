@@ -8,21 +8,22 @@ ENV LD_LIBRARY_PATH /usr/local/lib/
 ENV GEOSERVER_HOME /opt/geoserver
 
 RUN apk --update --no-cache add gcc  g++ make swig && \
+# Install GDAL
     wget http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz -O /tmp/gdal.tar.gz && \
     tar xzf /tmp/gdal.tar.gz -C /tmp && \
-    cd /tmp/gdal-${GDAL_VERSION} && ./configure  --with-java=$JAVA_HOME && make && make install
-
+    cd /tmp/gdal-${GDAL_VERSION} && ./configure  --with-java=$JAVA_HOME && make && make install && \
 # Install Apacvhe Ant
-RUN cd /tmp && \
+    cd /tmp && \
     wget http://mirrors.ae-online.de/apache/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz -O /tmp/ant.tar.gz && \
     tar xzf /tmp/ant.tar.gz -C /tmp && rm /tmp/ant.tar.gz && \
-    ln -s /tmp/apache-ant-${ANT_VERSION}/bin/ant /usr/local/bin/ant
-
+    ln -s /tmp/apache-ant-${ANT_VERSION}/bin/ant /usr/local/bin/ant && \
 # Install GDAL Java binding
-RUN cd /tmp/gdal-${GDAL_VERSION}/swig/java && \
+    cd /tmp/gdal-${GDAL_VERSION}/swig/java && \
     sed -i '/JAVA_HOME =/d' java.opt && \
     make && make install && \
     cp *.so /usr/local/lib/ && \
+    apk del gcc  g++ make swig && \
+    rm -rf /var/cahce/apk/* && \
     rm -rf /tmp/build
  
 # Get native JAI and ImageIO
