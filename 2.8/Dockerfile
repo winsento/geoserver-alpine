@@ -7,7 +7,7 @@ ENV ANT_VERSION 1.9.7
 ENV LD_LIBRARY_PATH /usr/local/lib/
 ENV GEOSERVER_HOME /opt/geoserver
 
-RUN apk --update --no-cache add gcc  g++ make swig && \
+RUN apk --update --no-cache add g++ libstdc++ make swig && \
 # Install GDAL
     wget http://download.osgeo.org/gdal/${GDAL_VERSION}/gdal-${GDAL_VERSION}.tar.gz -O /tmp/gdal.tar.gz && \
     tar xzf /tmp/gdal.tar.gz -C /tmp && \
@@ -22,9 +22,10 @@ RUN apk --update --no-cache add gcc  g++ make swig && \
     sed -i '/JAVA_HOME =/d' java.opt && \
     make && make install && \
     cp *.so /usr/local/lib/ && \
-    apk del gcc  g++ make swig && \
+    mv /tmp/gdal-${GDAL_VERSION}/swig/java/gdal.jar /usr/share/gdal.jar && \
+    apk del g++ make swig && \
     rm -rf /var/cahce/apk/* && \
-    rm -rf /tmp/build
+    rm -rf /tmp/*
  
 # Get native JAI and ImageIO
 RUN \
@@ -57,7 +58,7 @@ RUN wget -c http://downloads.sourceforge.net/project/geoserver/GeoServer/$GEOSER
 
 # Replace GDAL Java bindings
 RUN rm -rf $GEOSERVER_HOME/webapps/geoserver/WEB-INF/lib/imageio-ext-gdal-bindings-1.9.2.jar
-RUN cp /tmp/gdal-${GDAL_VERSION}/swig/java/gdal.jar $GEOSERVER_HOME/webapps/geoserver/WEB-INF/lib/gdal.jar
+RUN cp /usr/share/gdal.jar $GEOSERVER_HOME/webapps/geoserver/WEB-INF/lib/gdal.jar
 
 # Expose GeoServer's default port
 EXPOSE 8080
