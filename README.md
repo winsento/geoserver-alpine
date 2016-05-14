@@ -24,7 +24,7 @@ Is not official GeoServer image based on [Alpine-Java](https://hub.docker.com/r/
 ## Start a GeoServer instance ##
 
 ```console
-$ docker run -d winsent/geoserver
+$ docker run -d winsent/geoserver-alpine
 
 ```
 You can test it by visiting http://container-ip:8080
